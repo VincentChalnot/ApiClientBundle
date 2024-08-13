@@ -1,0 +1,39 @@
+{
+    "name": "sidus/api-client-bundle",
+    "description": "Ease the creation of business API client with authentication, serialization and cache",
+    "keywords": [
+        "sidus",
+        "api",
+        "client",
+        "oauth",
+        "serializer",
+        "cache"
+    ],
+    "homepage": "https://github.com/VincentChalnot/api-client-bundle",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vincent Chalnot",
+            "email": "vincent.chalnot@gmail.com",
+            "homepage": "https://github.com/VincentChalnot",
+            "role": "Lead Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Sidus\\ApiClientBundle\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.1",
+        "symfony/serializer": ">5.3",
+        "symfony/cache-contracts": ">2.0",
+        "psr/http-client": ">1.0",
+        "psr/http-factory": ">1.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "*",
+        "nyholm/psr7": "*"
+    }
+}
