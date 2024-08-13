@@ -18,13 +18,16 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class CacheComponent implements CacheComponentInterface
 {
+    protected array $tags = [];
+
     protected ?CacheItemInterface $cacheItem = null;
 
     public function __construct(
         protected int $ttl,
-        protected array $tags = [],
+        array $tags = [],
         protected ?string $user = null,
     ) {
+        $this->setTags($tags);
     }
 
     public function getTtl(): int

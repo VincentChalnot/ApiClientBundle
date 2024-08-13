@@ -48,7 +48,7 @@ class CacheRequestHandler implements EventSubscriberInterface
             return;
         }
         if (!$this->cache) {
-            $this->logger->warning('CacheRequestHandler is enabled but no cache component is available');
+            $this->logger->warning('CacheRequestHandler is enabled but no cache provider is available');
 
             return;
         }
