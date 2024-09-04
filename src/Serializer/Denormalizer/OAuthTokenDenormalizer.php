@@ -22,7 +22,7 @@ class OAuthTokenDenormalizer implements DenormalizerInterface
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): OAuthToken
     {
         if (!array_key_exists('access_token', $data)) {
-            throw MissingResponseParameterException::create($data, 'access_token');
+            throw MissingResponseParameterException::createMissingResponseParameterException($data, 'access_token');
         }
 
         return new OAuthToken(

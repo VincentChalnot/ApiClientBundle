@@ -11,31 +11,40 @@ namespace Sidus\ApiClientBundle\Model\Exception;
 
 use Sidus\ApiClientBundle\Contracts\Response\ApiResponseInterface;
 
+/**
+ * This is a general exception thrown when a request failed
+ */
 class RequestFailedException extends \RuntimeException
 {
-    public function __construct(
-        protected ApiResponseInterface $apiResponse,
+    protected ?ApiResponseInterface $apiResponse = null;
+
+    public static function createRequestFailedException(
+        ApiResponseInterface $apiResponse,
         $message = 'Request have failed',
-    ) {
+        ?\Throwable $previous = null,
+    ): static {
         $message .= " (status code {$apiResponse->getStatusCode()})";
 
-        parent::__construct($message);
+        $error = new static($message, 0, $previous);
+        $error->apiResponse = $apiResponse;
+
+        return $error;
     }
 
-    public function getApiResponse(): ApiResponseInterface
-    {
-        return $this->apiResponse;
-    }
-
-    public static function createFromResponse(ApiResponseInterface $apiResponse): self
+    public static function createFromResponse(ApiResponseInterface $apiResponse): static
     {
         $statusCode = $apiResponse->getStatusCode();
         if ($statusCode >= 400 && $statusCode < 500) {
-            return new ClientRequestFailedException($apiResponse);
+            return ClientRequestFailedException::createClientRequestFailedException($apiResponse);
         }
         if ($statusCode >= 500 && $statusCode < 600) {
-            return new ServerRequestFailedException($apiResponse);
+            return ServerRequestFailedException::createServerRequestFailedException($apiResponse);
         }
-        return new RequestFailedException($apiResponse);
+        return static::createRequestFailedException($apiResponse);
+    }
+
+    public function getApiResponse(): ?ApiResponseInterface
+    {
+        return $this->apiResponse;
     }
 }

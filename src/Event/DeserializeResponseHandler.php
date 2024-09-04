@@ -12,8 +12,8 @@ namespace Sidus\ApiClientBundle\Event;
 use Sidus\ApiClientBundle\Contracts\Request\WithDeserializationComponentInterface;
 use Sidus\ApiClientBundle\Contracts\Response\ApiResponseInterface;
 use Sidus\ApiClientBundle\Model\Event\ApiResponseEvent;
-use Sidus\ApiClientBundle\Model\Exception\ApiDeserializationException;
-use Sidus\ApiClientBundle\Model\Exception\ApiRequestException;
+use Sidus\ApiClientBundle\Model\Exception\DeserializationException;
+use Sidus\ApiClientBundle\Model\Exception\ServerRequestFailedException;
 use Sidus\ApiClientBundle\Model\Request\Component\DeserializationComponent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -61,6 +61,9 @@ class DeserializeResponseHandler implements EventSubscriberInterface
         $apiResponse->setContent($content);
     }
 
+    /**
+     * @todo test the use of the errorClassName option
+     */
     protected function handleDeserializationException(
         ApiResponseInterface $apiResponse,
         DeserializationComponent $deserialization,
@@ -68,10 +71,10 @@ class DeserializeResponseHandler implements EventSubscriberInterface
     ): void {
         $errorClassName = $deserialization->getErrorClassName();
         if (!$errorClassName) {
-            throw ApiDeserializationException::create(
-                $exception,
-                $apiResponse->getBody(),
-                $deserialization->getClassName(),
+            throw DeserializationException::createApiDeserializationException(
+                apiResponse: $apiResponse,
+                previous: $exception,
+                className: $deserialization->getClassName(),
             );
         }
 
@@ -82,17 +85,17 @@ class DeserializeResponseHandler implements EventSubscriberInterface
                 format: $deserialization->getDeserializationFormat(),
                 context: $deserialization->getDeserializationContext()
             );
-        } catch (\Exception $errorDeserializationException) {
-            throw new ApiDeserializationException(
-                "Unable to deserialize error data from response: {$apiResponse->getBody()}",
-                0,
-                $errorDeserializationException,
+        } catch (\Exception) {
+            throw DeserializationException::createApiDeserializationException(
+                apiResponse: $apiResponse,
+                previous: $exception,
+                className: $deserialization->getClassName(),
             );
         }
         if (!$apiException instanceof \Throwable) {
             throw new \LogicException("Error class {$errorClassName} is not a valid Throwable");
         }
-        throw new ApiRequestException(
+        throw new ServerRequestFailedException(
             "The API returned an error: {$apiException->getMessage()}",
             0,
             $apiException,

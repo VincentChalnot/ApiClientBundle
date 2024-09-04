@@ -9,10 +9,17 @@ declare(strict_types=1);
 
 namespace Sidus\ApiClientBundle\Model\Exception;
 
-class MissingCredentialsException extends \RuntimeException
+use Sidus\ApiClientBundle\Contracts\Request\ApiRequestInterface;
+
+class MissingCredentialsException extends CredentialNegotiationException
 {
-    public function __construct(string $baseUri, $message = 'No credentials found matching the base URI: %s')
-    {
-        parent::__construct(sprintf($message, $baseUri));
+    public static function createMissingCredentialsException(
+        ApiRequestInterface $apiRequest,
+        $message = 'No credentials found matching the base URI: %s',
+    ): static {
+        $error = new static(sprintf($message, $apiRequest->getHttpComponent()->getBaseUri()));
+        $error->apiRequest = $apiRequest;
+
+        return $error;
     }
 }

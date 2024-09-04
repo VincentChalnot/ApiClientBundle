@@ -11,15 +11,20 @@ namespace Sidus\ApiClientBundle\Model\Exception;
 
 use Sidus\ApiClientBundle\Contracts\Response\ApiResponseInterface;
 
+/**
+ * Thrown when the request failed on the client side
+ */
 class ClientRequestFailedException extends RequestFailedException
 {
-    public function __construct(ApiResponseInterface $apiResponse, $message = 'Request have failed on client side')
-    {
+    public static function createClientRequestFailedException(
+        ApiResponseInterface $apiResponse,
+        $message = 'Request have failed on client side',
+    ): static {
         $statusCode = $apiResponse->getStatusCode();
         if ($statusCode < 400 || $statusCode >= 500) {
             throw new \InvalidArgumentException('Exception reserved to 4xx responses');
         }
 
-        parent::__construct($apiResponse, $message);
+        return static::createRequestFailedException($apiResponse, $message);
     }
 }

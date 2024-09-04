@@ -9,31 +9,27 @@ declare(strict_types=1);
 
 namespace Sidus\ApiClientBundle\Model\Exception;
 
+use Sidus\ApiClientBundle\Contracts\Response\ApiResponseInterface;
+
 /**
  * Thrown when not able to deserialize a response from the API.
  */
-class ApiDeserializationException extends ApiRequestException
+class DeserializationException extends ClientRequestFailedException
 {
-    protected ?string $responseBody;
-
     protected string $className;
 
-    public static function create(
+    public static function createApiDeserializationException(
+        ApiResponseInterface $apiResponse,
         \Throwable $previous,
-        ?string $responseBody,
         string $className,
-    ): self {
-        $exception = new self("Unable to deserialize data from response: {$responseBody}", 0, $previous);
-        $exception->responseBody = $responseBody;
+    ): static {
+        $exception = new static("Unable to deserialize data from response: {$apiResponse->getBody()}", 0, $previous);
+        $exception->apiResponse = $apiResponse;
         $exception->className = $className;
 
         return $exception;
     }
 
-    public function getResponseBody(): ?string
-    {
-        return $this->responseBody;
-    }
 
     public function getClassName(): string
     {

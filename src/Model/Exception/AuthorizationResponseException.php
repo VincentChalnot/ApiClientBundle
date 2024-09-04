@@ -9,9 +9,26 @@ declare(strict_types=1);
 
 namespace Sidus\ApiClientBundle\Model\Exception;
 
+use Sidus\ApiClientBundle\Contracts\Response\ApiResponseInterface;
+
 /**
  * Thrown when unable to authenticate against the server API.
  */
-class AuthorizationResponseException extends RequestFailedException
+class AuthorizationResponseException extends CredentialNegotiationException
 {
+    public static function createAuthorizationResponseException(
+        ApiResponseInterface $apiResponse,
+    ): static {
+        $error = new static(
+            sprintf(
+                'Unable to get authorization from remote server %s: %d',
+                $apiResponse->getApiRequest()->getHttpComponent()->getUri(),
+                $apiResponse->getStatusCode(),
+            ),
+        );
+        $error->apiRequest = $apiResponse->getApiRequest();
+        $error->apiResponse = $apiResponse;
+
+        return $error;
+    }
 }

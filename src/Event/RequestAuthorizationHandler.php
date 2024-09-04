@@ -62,7 +62,9 @@ class RequestAuthorizationHandler implements EventSubscriberInterface
         $http = $apiRequest->getHttpComponent();
         $credentials = $this->getCredentialsForBaseUri($http->getBaseUri());
         if (null === $credentials) {
-            throw new MissingCredentialsException($apiRequest->getHttpComponent()->getBaseUri());
+            throw MissingCredentialsException::createMissingCredentialsException(
+                apiRequest: $apiRequest,
+            );
         }
 
         $authorizationRequest = $credentials->createAuthorizationRequest();
@@ -86,21 +88,15 @@ class RequestAuthorizationHandler implements EventSubscriberInterface
     protected function handleAuthorizationResponse(ApiResponseInterface $apiResponse): AuthorizationComponentInterface
     {
         if (200 !== $apiResponse->getStatusCode()) {
-            throw new AuthorizationResponseException(
-                $apiResponse,
-                sprintf(
-                    'Unable to get authorization from remote server %s: %d',
-                    $apiResponse->getApiRequest()->getHttpComponent()->getUri(),
-                    $apiResponse->getStatusCode(),
-                ),
+            throw AuthorizationResponseException::createAuthorizationResponseException(
+                apiResponse: $apiResponse,
             );
         }
 
         $content = $apiResponse->getContent();
         if (!$content instanceof AuthorizationComponentInterface) {
             // This should never happen, this means that your configuration is wrong
-            throw new AuthorizationResponseException(
-                $apiResponse,
+            throw new \LogicException(
                 sprintf(
                     'Authorization response from remote server %s is not an AuthorizationComponentInterface: %s',
                     $apiResponse->getApiRequest()->getHttpComponent()->getUri(),

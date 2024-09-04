@@ -9,13 +9,19 @@ declare(strict_types=1);
 
 namespace Sidus\ApiClientBundle\Model\Exception;
 
-class MissingResponseParameterException extends \RuntimeException
+/**
+ * This exception is thrown when a token response is missing the expected parameter
+ */
+class MissingResponseParameterException extends CredentialNegotiationException
 {
-    public static function create(array $data, string $parameter, ?string $message = null): self
-    {
+    public static function createMissingResponseParameterException(
+        array $data,
+        string $parameter,
+        ?string $message = null,
+    ): static {
         $message ??= 'Available parameters are '.implode(', ', array_keys($data));
 
-        return new self(
+        return new static(
             "Missing parameter '{$parameter}' in response: {$message}",
         );
     }

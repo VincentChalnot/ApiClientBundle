@@ -13,13 +13,15 @@ use Sidus\ApiClientBundle\Contracts\Response\ApiResponseInterface;
 
 class ServerRequestFailedException extends RequestFailedException
 {
-    public function __construct(ApiResponseInterface $apiResponse, $message = 'Request have failed on server side')
-    {
+    public static function createServerRequestFailedException(
+        ApiResponseInterface $apiResponse,
+        $message = 'Request have failed on server side',
+    ): static {
         $statusCode = $apiResponse->getStatusCode();
         if ($statusCode < 500 || $statusCode >= 600) {
             throw new \InvalidArgumentException('Exception reserved to 5xx responses');
         }
 
-        parent::__construct($apiResponse, $message);
+        return static::createRequestFailedException($apiResponse, $message);
     }
 }
