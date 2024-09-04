@@ -14,8 +14,4 @@ namespace Sidus\ApiClientBundle\Model\Exception;
  */
 class ApiRequestException extends \RuntimeException
 {
-    public static function create(string $uri, \Exception $e = null): self
-    {
-        return new self("Unable to reach remote API '{$uri}'", 0, $e);
-    }
 }

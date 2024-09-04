@@ -69,6 +69,9 @@ class CacheRequestHandler implements EventSubscriberInterface
     public function onApiResponse(ApiResponseEvent $event): void
     {
         $apiResponse = $event->response;
+        if ($apiResponse->getStatusCode() !== 200) {
+            return; // Only cache successful responses
+        }
         $apiRequest = $apiResponse->getApiRequest();
         if (!$apiRequest instanceof WithCacheComponentInterface) {
             return;

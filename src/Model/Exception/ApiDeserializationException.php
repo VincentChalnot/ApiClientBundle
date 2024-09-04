@@ -12,7 +12,7 @@ namespace Sidus\ApiClientBundle\Model\Exception;
 /**
  * Thrown when not able to deserialize a response from the API.
  */
-class ApiDeserializationException extends \RuntimeException
+class ApiDeserializationException extends ApiRequestException
 {
     protected ?string $responseBody;
 
